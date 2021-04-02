@@ -1,52 +1,30 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(bitcoin-wallet-xpub)
+# Find header and source files
+FILE(GLOB bitcoin-wallet-xpub_header ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+FILE(GLOB bitcoin-wallet-xpub_source ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+# Set target libraries
+ADD_LIBRARY(bitcoin-wallet-xpub SHARED ${bitcoin-wallet-xpub_source})
+ADD_LIBRARY(bitcoin-wallet-xpub_static STATIC ${bitcoin-wallet-xpub_source})
 
-# Set compiler settings
-SET(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall")
+find_package(PkgConfig REQUIRED)
 
-# Set version number
-SET(MAJOR_VERSION 0)
-SET(MINOR_VERSION 1)
-SET(PATCH_VERSION 0)
-SET(SO_VERSION    0)
+# Set output name of static library
+SET_TARGET_PROPERTIES(bitcoin-wallet-xpub_static PROPERTIES OUTPUT_NAME bitcoin-wallet-xpub)
 
-# Add source directory
-ADD_SUBDIRECTORY(src/bitcoin-wallet-xpub)
+# Set version settings
+SET(VERSION_STRING ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION})
+SET_TARGET_PROPERTIES(bitcoin-wallet-xpub bitcoin-wallet-xpub_static PROPERTIES
+    VERSION "${VERSION_STRING}"
+    SOVERSION "${SO_VERSION}")
+#
 
-# FIND_PACKAGE(Boost COMPONENTS unit_test_framework)
-# IF(Boost_FOUND)
-#     ADD_SUBDIRECTORY(src/test)
-# ENDIF()
+pkg_check_modules (LIBBITCOINSYSTEMCPP libbitcoin-system)
+#
+TARGET_LINK_LIBRARIES(bitcoin-wallet-xpub)
 
-# Set package settings
-IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
-INCLUDE(InstallRequiredSystemLibraries)
+# Install to appropriate destinations
+INSTALL(FILES ${bitcoin-wallet-xpub_header} DESTINATION include/bitcoin-wallet-xpub)
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	SET(CPACK_GENERATOR "PackageMaker")
-	SET(CPACK_PACKAGING_INSTALL_PREFIX "/opt/local")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	SET(CPACK_GENERATOR "DEB")
-	SET(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-SET(CPACK_PACKAGE_DESCRIPTION "C++ interface for communication with Bitcoin Wallet xpub.")
-SET(CPACK_PACKAGE_VENDOR "Rafael Medeiros")
-SET(CPACK_PACKAGE_CONTACT "Rafael Medeiros <rafaelgurudesign@gmail.com>")
-SET(CPACK_PACKAGE_VERSION_MAJOR "${MAJOR_VERSION}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${MINOR_VERSION}")
-
-SET(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${MAJOR_VERSION}.${MINOR_VERSION}")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${MAJOR_VERSION}.${MINOR_VERSION}")
-
-SET(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
-
-SET(CPACK_COMPONENTS_ALL bitcoinapi)
-INCLUDE(CPack)
-
-
-ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+INSTALL(TARGETS bitcoin-wallet-xpub bitcoin-wallet-xpub_static
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)

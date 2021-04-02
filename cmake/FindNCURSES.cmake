@@ -1,0 +1,46 @@
+# -*- cmake -*-
+# - Find ncurses
+# Find the ncurses includes and library
+# This module defines
+#  NCURSES_INCLUDE_DIRS, where to find ncurses.h, etc.
+#  NCURSES_LIBRARIES, the libraries needed to use ncurses.
+#  NCURSES_FOUND, If false, do not try to use ncurses.
+#  also defined, but not for general use are
+#  NCURSES_LIBRARIES, where to find the ncurses library.
+
+FIND_PATH(NCURSES_INCLUDE_DIRS ncurses.h
+/usr/include
+/usr/local/include
+${CMAKE_SOURCE_DIR}/win32-deps/include
+PATH_SUFFIXES ncurses
+)
+
+
+FIND_LIBRARY(NCURSES_LIBRARIES NAMES ncurses HINTS /usr/lib /usr/local/lib 	${CMAKE_SOURCE_DIR}/win32-deps/lib)
+
+IF (NCURSES_LIBRARIES AND NCURSES_INCLUDE_DIRS)
+    SET(NCURSES_LIBRARIES ${NCURSES_LIBRARIES})
+    SET(NCURSES_FOUND "YES")
+ELSE (NCURSES_LIBRARIES AND NCURSES_INCLUDE_DIRS)
+  SET(NCURSES_FOUND "NO")
+ENDIF (NCURSES_LIBRARIES AND NCURSES_INCLUDE_DIRS)
+
+
+IF (NCURSES_FOUND)
+   IF (NOT NCURSES_FIND_QUIETLY)
+      MESSAGE(STATUS "Found ncurses: ${NCURSES_LIBRARIES}")
+   ENDIF (NOT NCURSES_FIND_QUIETLY)
+ELSE (NCURSES_FOUND)
+   IF (NCURSES_FIND_REQUIRED)
+      MESSAGE(FATAL_ERROR "Could not find NCURSES library include: ${NCURSES_INCLUDE_DIRS}, lib: ${NCURSES_LIBRARIES}")
+   ENDIF (NCURSES_FIND_REQUIRED)
+ENDIF (NCURSES_FOUND)
+
+# Deprecated declarations.
+SET (NATIVE_NCURSES_INCLUDE_PATH ${NCURSES_INCLUDE_DIRS} )
+GET_FILENAME_COMPONENT (NATIVE_NCURSES_LIB_PATH ${NCURSES_LIBRARIES} PATH)
+
+MARK_AS_ADVANCED(
+  NCURSES_LIBRARIES
+  NCURSES_INCLUDE_DIRS
+  )
